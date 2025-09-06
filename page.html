@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Algorithmic Techniques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        .tab-active {
+            background-color: #4338ca;
+            color: #ffffff;
+            border-color: #4338ca;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px; 
+            }
+        }
+        .brute-force-box {
+            transition: all 0.3s ease-in-out;
+            border: 2px solid #d1d5db;
+        }
+        .brute-force-box.checking {
+            transform: scale(1.1);
+            border-color: #fbbf24;
+            background-color: #fef3c7;
+        }
+        .brute-force-box.max {
+            border-color: #22c55e;
+            background-color: #dcfce7;
+        }
+         .brute-force-box.final-max {
+            transform: scale(1.1);
+            border-color: #16a34a;
+            background-color: #bbf7d0;
+            box-shadow: 0 0 15px rgba(22, 163, 74, 0.5);
+        }
+        .coin {
+            transition: all 0.5s ease-in-out;
+        }
+        .queen {
+            font-size: 1.75rem;
+            line-height: 2.25rem;
+            text-align: center;
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">An Interactive Guide to Algorithmic Techniques</h1>
+            <p class="text-lg text-slate-600 mt-2">Click on a technique to learn about it and see a visual demonstration.</p>
+        </header>
+
+        <nav id="tabs" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+            <button data-tab="brute-force" class="tab-btn px-4 py-2 rounded-lg font-semibold border-2 border-slate-300 hover:bg-indigo-500 hover:text-white transition-colors tab-active">Brute-Force</button>
+            <button data-tab="greedy" class="tab-btn px-4 py-2 rounded-lg font-semibold border-2 border-slate-300 hover:bg-indigo-500 hover:text-white transition-colors">Greedy</button>
+            <button data-tab="dynamic-programming" class="tab-btn px-4 py-2 rounded-lg font-semibold border-2 border-slate-300 hover:bg-indigo-500 hover:text-white transition-colors">Dynamic Programming</button>
+            <button data-tab="backtracking" class="tab-btn px-4 py-2 rounded-lg font-semibold border-2 border-slate-300 hover:bg-indigo-500 hover:text-white transition-colors">Backtracking</button>
+        </nav>
+
+        <main id="content-container">
+            <section id="brute-force" class="content-section content-active p-6 bg-white rounded-xl shadow-lg">
+                 <p class="text-slate-600 mb-6 text-center">This section demonstrates the Brute-Force technique. This straightforward approach solves problems by trying every possible solution until the correct one is found. Below, you can see a visualization of finding the largest number in a list by exhaustively checking each and every element.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4 text-indigo-700">The Brute-Force Approach</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold">Concept</h3>
+                                <p class="text-slate-600">A straightforward approach that systematically checks every possible solution to find the correct one.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Best For</h3>
+                                <p class="text-slate-600">Simple problems with a small number of potential solutions.</p>
+                            </div>
+                             <div>
+                                <h3 class="font-semibold">Drawbacks</h3>
+                                <p class="text-slate-600">Can be very slow and inefficient for complex problems.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-center mb-2">Example: Find Maximum Value</h3>
+                        <p class="text-sm text-slate-500 text-center mb-4">Click the button to watch the algorithm check every number to find the largest.</p>
+                        <div id="brute-force-viz" class="flex justify-center items-center gap-2 h-24">
+                        </div>
+                        <div class="text-center mt-4">
+                            <p class="mb-2">Current Max: <span id="brute-force-max" class="font-bold text-xl text-green-600">-</span></p>
+                            <button id="run-brute-force" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">Find Maximum</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+    
+            <section id="greedy" class="content-section p-6 bg-white rounded-xl shadow-lg">
+                 <p class="text-slate-600 mb-6 text-center">Explore the Greedy algorithm, a technique that makes the best possible choice at each immediate step, hoping this leads to a globally optimal solution. The visualization below demonstrates this with the classic change-making problem, where the algorithm always picks the largest coin denomination possible.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4 text-teal-700">Greedy Algorithms</h2>
+                        <div class="space-y-4">
+                             <div>
+                                <h3 class="font-semibold">Concept</h3>
+                                <p class="text-slate-600">At each step, a greedy algorithm makes the locally optimal choice in the hope that this will lead to a globally optimal solution.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Best For</h3>
+                                <p class="text-slate-600">Problems where a series of small, optimal choices leads to the best overall solution.</p>
+                            </div>
+                             <div>
+                                <h3 class="font-semibold">Drawbacks</h3>
+                                <p class="text-slate-600">It doesn't always work! The "best" local choice might not be part of the "best" global solution.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-center mb-2">Example: Making Change</h3>
+                         <p class="text-sm text-slate-500 text-center mb-4">Click to get change for 87 cents using the largest coins first.</p>
+                        <div class="text-center mb-4">
+                             <p>Amount to Change: <span class="font-bold text-xl text-teal-600">87¢</span></p>
+                             <p>Remaining: <span id="greedy-remaining" class="font-bold text-xl text-red-600">87¢</span></p>
+                        </div>
+                        <div class="mb-4">
+                            <h4 class="font-semibold text-center">Available Coins</h4>
+                            <div id="greedy-coins" class="flex justify-center items-center gap-4 h-16">
+                                <div data-value="25" class="coin w-14 h-14 rounded-full bg-slate-400 flex items-center justify-center text-white font-bold text-lg">25¢</div>
+                                <div data-value="10" class="coin w-12 h-12 rounded-full bg-slate-400 flex items-center justify-center text-white font-bold">10¢</div>
+                                <div data-value="5" class="coin w-10 h-10 rounded-full bg-slate-400 flex items-center justify-center text-white font-bold text-sm">5¢</div>
+                                <div data-value="1" class="coin w-8 h-8 rounded-full bg-slate-400 flex items-center justify-center text-white font-bold text-xs">1¢</div>
+                            </div>
+                        </div>
+                         <div class="mb-4">
+                            <h4 class="font-semibold text-center">Change Given</h4>
+                            <div id="greedy-change" class="flex justify-center items-center gap-2 h-16 bg-green-100 rounded-lg p-2 min-h-[4rem]"></div>
+                        </div>
+                        <div class="text-center">
+                           <button id="run-greedy" class="bg-teal-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-teal-700 transition">Make Change</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dynamic Programming Section -->
+            <section id="dynamic-programming" class="content-section p-6 bg-white rounded-xl shadow-lg">
+                 <p class="text-slate-600 mb-6 text-center">Dynamic Programming solves complex problems by breaking them into smaller, overlapping subproblems and storing their solutions to avoid redundant work. This interactive chart visualizes the massive efficiency gain by comparing the number of calculations needed for the Fibonacci sequence with and without this technique. Adjust the slider to see the difference.</p>
+                 <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4 text-sky-700">Dynamic Programming</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold">Concept</h3>
+                                <p class="text-slate-600">Solves complex problems by breaking them down into smaller subproblems and storing their solutions (memoization) to reuse later, avoiding redundant calculations.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Best For</h3>
+                                <p class="text-slate-600">Problems with optimal substructure and overlapping subproblems.</p>
+                            </div>
+                             <div>
+                                <h3 class="font-semibold">Drawbacks</h3>
+                                <p class="text-slate-600">Can use significant memory to store the solutions to subproblems.</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-slate-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-center mb-2">Example: Fibonacci Sequence Efficiency</h3>
+                        <p class="text-sm text-slate-500 text-center mb-4">Slide to change 'n' and see how many function calls are needed with and without Dynamic Programming.</p>
+                        <div class="chart-container">
+                            <canvas id="dp-chart"></canvas>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <label for="fib-n" class="font-semibold">Fibonacci Number (n): <span id="fib-n-value" class="font-bold text-sky-600">10</span></label>
+                            <input id="fib-n" type="range" min="1" max="25" value="10" class="w-full mt-2">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        
+            <section id="backtracking" class="content-section p-6 bg-white rounded-xl shadow-lg">
+                 <p class="text-slate-600 mb-6 text-center">Backtracking builds a solution step-by-step and "backtracks" as soon as it determines a path won't work. It's a powerful technique for solving constraint-satisfaction problems. The animation below shows backtracking in action as it tries to solve the classic N-Queens puzzle, placing queens on a chessboard so that none can attack each other.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4 text-rose-700">Backtracking</h2>
+                         <div class="space-y-4">
+                             <div>
+                                <h3 class="font-semibold">Concept</h3>
+                                <p class="text-slate-600">Builds a candidate solution incrementally and abandons a path ("backtracks") as soon as it determines it cannot possibly lead to a valid solution.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Best For</h3>
+                                <p class="text-slate-600">Solving puzzles, search problems, and constraint-satisfaction problems like Sudoku or finding all permutations.</p>
+                            </div>
+                             <div>
+                                <h3 class="font-semibold">Drawbacks</h3>
+                                <p class="text-slate-600">Can be computationally expensive as it may explore a large number of paths.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-center mb-2">Example: N-Queens Puzzle</h3>
+                        <p class="text-sm text-slate-500 text-center mb-4">Watch the algorithm place queens, detect conflicts, and backtrack to find a solution.</p>
+                        <div class="flex justify-center">
+                           <div id="n-queens-board" class="grid grid-cols-8 w-64 h-64 md:w-80 md:h-80 shadow-lg"></div>
+                        </div>
+                        <div class="text-center mt-4">
+                           <p id="n-queens-status" class="mb-2 h-6 text-rose-600 font-semibold"></p>
+                           <button id="run-backtracking" class="bg-rose-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-rose-700 transition">Solve</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contentSections = document.querySelectorAll('.content-section');
+            let isAnimating = false;
+
+            const switchTab = (tab) => {
+                tabs.forEach(t => t.classList.remove('tab-active'));
+                tab.classList.add('tab-active');
+
+                contentSections.forEach(c => c.classList.remove('content-active'));
+                document.getElementById(tab.dataset.tab).classList.add('content-active');
+            };
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab));
+            });
+            
+            const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+            
+            function setupBruteForce() {
+                const vizContainer = document.getElementById('brute-force-viz');
+                const runBtn = document.getElementById('run-brute-force');
+                const maxDisplay = document.getElementById('brute-force-max');
+                const numbers = [17, 4, 31, 22, 5, 29];
+
+                const createBoxes = () => {
+                    vizContainer.innerHTML = '';
+                    numbers.forEach(num => {
+                        const box = document.createElement('div');
+                        box.className = 'brute-force-box w-12 h-12 flex items-center justify-center text-lg font-bold rounded-lg';
+                        box.textContent = num;
+                        box.dataset.value = num;
+                        vizContainer.appendChild(box);
+                    });
+                }
+
+                runBtn.addEventListener('click', async () => {
+                    if (isAnimating) return;
+                    isAnimating = true;
+                    runBtn.disabled = true;
+                    runBtn.classList.add('opacity-50');
+                    createBoxes();
+                    maxDisplay.textContent = '-';
+                    const boxes = vizContainer.querySelectorAll('.brute-force-box');
+                    let maxVal = -Infinity;
+                    let maxBox = null;
+
+                    for (const box of boxes) {
+                        box.classList.add('checking');
+                        await sleep(500);
+
+                        const currentVal = parseInt(box.dataset.value);
+                        if (currentVal > maxVal) {
+                            maxVal = currentVal;
+                            maxDisplay.textContent = maxVal;
+                            if (maxBox) maxBox.classList.remove('max');
+                            maxBox = box;
+                            maxBox.classList.add('max');
+                        }
+                        
+                        await sleep(500);
+                        box.classList.remove('checking');
+                    }
+                    if(maxBox) maxBox.classList.add('final-max');
+
+                    isAnimating = false;
+                    runBtn.disabled = false;
+                    runBtn.classList.remove('opacity-50');
+                });
+                
+                createBoxes();
+            }
+            setupBruteForce();
+
+            function setupGreedy() {
+                const runBtn = document.getElementById('run-greedy');
+                const remainingDisplay = document.getElementById('greedy-remaining');
+                const changeContainer = document.getElementById('greedy-change');
+                const coins = Array.from(document.querySelectorAll('#greedy-coins .coin')).map(c => parseInt(c.dataset.value));
+
+                const resetGreedy = () => {
+                    remainingDisplay.textContent = '87¢';
+                    changeContainer.innerHTML = '';
+                };
+
+                runBtn.addEventListener('click', async () => {
+                     if (isAnimating) return;
+                    isAnimating = true;
+                    runBtn.disabled = true;
+                    runBtn.classList.add('opacity-50');
+                    resetGreedy();
+
+                    let remaining = 87;
+
+                    for (const coinValue of coins) {
+                        const coinElement = document.querySelector(`#greedy-coins .coin[data-value='${coinValue}']`);
+                        while (remaining >= coinValue) {
+                            remaining -= coinValue;
+                            remainingDisplay.textContent = `${remaining}¢`;
+                            coinElement.style.transform = 'scale(1.2)';
+                            await sleep(300);
+
+                            const newCoin = coinElement.cloneNode(true);
+                            newCoin.style.transform = 'scale(1)';
+                            changeContainer.appendChild(newCoin);
+                            
+                            coinElement.style.transform = 'scale(1)';
+                            await sleep(300);
+                        }
+                    }
+                    
+                    isAnimating = false;
+                    runBtn.disabled = false;
+                    runBtn.classList.remove('opacity-50');
+                });
+                resetGreedy();
+            }
+            setupGreedy();
+
+            
+            function setupDP() {
+                const ctx = document.getElementById('dp-chart').getContext('2d');
+                const slider = document.getElementById('fib-n');
+                const nValueDisplay = document.getElementById('fib-n-value');
+                let dpChart;
+
+                let naiveCalls = 0;
+                function naiveFib(n) {
+                    naiveCalls++;
+                    if (n <= 1) return n;
+                    return naiveFib(n - 1) + naiveFib(n - 2);
+                }
+
+                let dpCalls = 0;
+                function dpFib(n, memo = {}) {
+                    dpCalls++;
+                    if (n in memo) return memo[n];
+                    if (n <= 1) return n;
+                    memo[n] = dpFib(n - 1, memo) + dpFib(n - 2, memo);
+                    return memo[n];
+                }
+
+                const updateChart = () => {
+                    const n = parseInt(slider.value);
+                    nValueDisplay.textContent = n;
+
+                    naiveCalls = 0;
+                    naiveFib(n);
+
+                    dpCalls = 0;
+                    dpFib(n);
+                    
+                    dpChart.data.datasets[0].data = [naiveCalls, dpCalls];
+                    dpChart.update();
+                };
+
+                dpChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Naive Recursive', 'Dynamic Programming'],
+                        datasets: [{
+                            label: '# of Function Calls',
+                            data: [0, 0],
+                            backgroundColor: ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)'],
+                            borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                type: 'logarithmic',
+                                ticks: {
+                                   callback: function(value, index, values) {
+                                       if (value === 10 || value === 100 || value === 1000 || value === 10000 || value === 100000 || value === 1000000) {
+                                           return value.toLocaleString();
+                                       }
+                                       if (value > 0 && Math.log10(value) % 1 === 0) return value.toLocaleString();
+                                   }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Function Calls to Calculate Fibonacci(n)' }
+                        }
+                    }
+                });
+
+                slider.addEventListener('input', updateChart);
+                updateChart();
+            }
+            setupDP();
+
+            function setupBacktracking() {
+                const boardContainer = document.getElementById('n-queens-board');
+                const runBtn = document.getElementById('run-backtracking');
+                const statusDisplay = document.getElementById('n-queens-status');
+                const N = 8;
+                
+                const createBoard = () => {
+                    boardContainer.innerHTML = '';
+                    for (let i = 0; i < N * N; i++) {
+                        const cell = document.createElement('div');
+                        const isLight = (Math.floor(i / N) + i % N) % 2 === 0;
+                        cell.className = `w-full h-full flex items-center justify-center ${isLight ? 'bg-slate-300' : 'bg-slate-500'}`;
+                        boardContainer.appendChild(cell);
+                    }
+                };
+
+                const updateBoard = (board) => {
+                    const cells = boardContainer.children;
+                    for (let i = 0; i < N; i++) {
+                        for (let j = 0; j < N; j++) {
+                           cells[i * N + j].innerHTML = board[i][j] ? '<span class="queen">♛</span>' : '';
+                        }
+                    }
+                };
+                
+                runBtn.addEventListener('click', async () => {
+                    if (isAnimating) return;
+                    isAnimating = true;
+                    runBtn.disabled = true;
+                    runBtn.classList.add('opacity-50');
+                    statusDisplay.textContent = 'Solving...';
+                    
+                    let board = Array(N).fill(0).map(() => Array(N).fill(0));
+                    
+                    function isSafe(row, col) {
+                        for (let i = 0; i < col; i++) if (board[row][i]) return false;
+                        for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) if (board[i][j]) return false;
+                        for (let i = row, j = col; i < N && j >= 0; i++, j--) if (board[i][j]) return false;
+                        return true;
+                    }
+
+                    async function solve(col) {
+                        if (col >= N) return true;
+
+                        for (let i = 0; i < N; i++) {
+                            statusDisplay.textContent = `Trying row ${i + 1}, col ${col + 1}`;
+                            if (isSafe(i, col)) {
+                                board[i][col] = 1;
+                                updateBoard(board);
+                                await sleep(100);
+
+                                if (await solve(col + 1)) return true;
+
+                                statusDisplay.textContent = `Backtracking from col ${col + 1}`;
+                                board[i][col] = 0;
+                                updateBoard(board);
+                                await sleep(100);
+                            }
+                        }
+                        return false;
+                    }
+                    
+                    createBoard();
+                    const foundSolution = await solve(0);
+                    statusDisplay.textContent = foundSolution ? 'Solution Found!' : 'No solution exists.';
+                    
+                    isAnimating = false;
+                    runBtn.disabled = false;
+                    runBtn.classList.remove('opacity-50');
+                });
+
+                createBoard();
+            }
+            setupBacktracking();
+        });
+    </script>
+</body>
+</html>
